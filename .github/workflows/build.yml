@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Install qemu-user-static
         run: sudo apt update && sudo apt install -y qemu-user-static
       - name: Patch pi-gen Dockerfile for archived bullseye repos
