@@ -13,6 +13,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Install qemu-user-static
         run: sudo apt update && sudo apt install -y qemu-user-static
+      - name: Patch pi-gen Dockerfile for archived bullseye repos
+        run: |
+          sed -i '/^FROM /a RUN sed -i "s|deb.debian.org|archive.debian.org|g; s|security.debian.org|archive.debian.org|g" /etc/apt/sources.list || true' pi-gen/Dockerfile
+          head -8 pi-gen/Dockerfile
       - name: Build IoMBian
         run:
           ./build-iombian.sh
