@@ -18,8 +18,8 @@ jobs:
       - name: Rename file name with tag name
         run: mv deploy/*.zip iombian-${{ github.ref_name }}.zip
       - name: Publish the artifacts
-        uses: skx/github-action-publish-binaries@master
+        uses: softprops/action-gh-release@v2
+        with:
+          files: iombian-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: 'iombian-${{ github.ref_name }}.zip'
