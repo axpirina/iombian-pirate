@@ -18,6 +18,7 @@ jobs:
       - name: Patch pi-gen Dockerfile for archived bullseye repos
         run: |
           sed -i -e '/^FROM /a RUN sed -i "s|deb.debian.org/debian-security|snapshot.debian.org/archive/debian-security/20240901T000000Z|g; s|security.debian.org/debian-security|snapshot.debian.org/archive/debian-security/20240901T000000Z|g; s|deb.debian.org/debian|snapshot.debian.org/archive/debian/20240901T000000Z|g" /etc/apt/sources.list' -e '/^FROM /a RUN echo "Acquire::Check-Valid-Until \\"false\\";" > /etc/apt/apt.conf.d/99no-valid-until' pi-gen/Dockerfile
+          sed -i 's|apt-get -y update &&|apt-get -y update \&\& apt-get -y dist-upgrade \&\&|' pi-gen/Dockerfile
           head -8 pi-gen/Dockerfile
       - name: Build IoMBian
         run:
