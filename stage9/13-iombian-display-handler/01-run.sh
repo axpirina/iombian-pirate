@@ -5,12 +5,18 @@ INSTALLATION_PATH="/opt/iombian-display-handler"
 
 # Enable I2C and SPI
 on_chroot << EOF
-sed -i '/#dtparam=spi=on/c\dtparam=spi=on' /boot/config.txt
-sed -i '/#dtparam=spi=off/c\dtparam=spi=on' /boot/config.txt
-sed -i '/dtparam=spi=off/c\dtparam=spi=on' /boot/config.txt
-sed -i '/#dtparam=i2c_arm=on/c\dtparam=i2c_arm=on' /boot/config.txt
-sed -i '/#dtparam=i2c_arm=off/c\dtparam=i2c_arm=on' /boot/config.txt
-sed -i '/dtparam=i2c_arm=off/c\dtparam=i2c_arm=on' /boot/config.txt
+# Bookworm-etik aurrera /boot/config.txt /boot/firmware/config.txt-ra mugitu da
+CONFIG_FILE="/boot/config.txt"
+if [ -f /boot/firmware/config.txt ]; then
+  CONFIG_FILE="/boot/firmware/config.txt"
+fi
+sed -i '/#dtparam=spi=on/c\dtparam=spi=on' \$CONFIG_FILE
+sed -i '/#dtparam=spi=off/c\dtparam=spi=on' \$CONFIG_FILE
+sed -i '/dtparam=spi=off/c\dtparam=spi=on' \$CONFIG_FILE
+sed -i '/#dtparam=i2c_arm=on/c\dtparam=i2c_arm=on' \$CONFIG_FILE
+sed -i '/#dtparam=i2c_arm=off/c\dtparam=i2c_arm=on' \$CONFIG_FILE
+sed -i '/dtparam=i2c_arm=off/c\dtparam=i2c_arm=on' \$CONFIG_FILE
+sed -i '\$a dtparam=spi=on\ndtparam=i2c_arm=on' \$CONFIG_FILE
 EOF
 
 # Create the installation folder

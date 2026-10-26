@@ -5,8 +5,16 @@ INSTALLATION_PATH="/opt/iombian-serial-configurator"
 
 # Enable DWC2 dtoverlay
 on_chroot << EOF
-sed -i 's/\[pi4\]/\[pi4\]\ndtoverlay=dwc2/' /boot/config.txt
-sed -i 's/rootwait/rootwait modules-load=dwc2,g_serial/' /boot/cmdline.txt
+CONFIG_FILE="/boot/config.txt"
+if [ -f /boot/firmware/config.txt ]; then
+  CONFIG_FILE="/boot/firmware/config.txt"
+fi
+CMDLINE_FILE="/boot/cmdline.txt"
+if [ -f /boot/firmware/cmdline.txt ]; then
+  CMDLINE_FILE="/boot/firmware/cmdline.txt"
+fi
+sed -i 's/\[pi4\]/\[pi4\]\ndtoverlay=dwc2/' \$CONFIG_FILE
+sed -i 's/rootwait/rootwait modules-load=dwc2,g_serial/' \$CMDLINE_FILE
 EOF
 
 # Create the installation folder
