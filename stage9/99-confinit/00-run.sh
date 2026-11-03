@@ -17,6 +17,13 @@ cp -av config ${ROOTFS_DIR}/boot
 on_chroot <<EOF
 curl -sSL  https://github.com/jriguera/confinit/releases/download/v${VERSION}/confinit-${VERSION}-linux-${ARCH} -o /bin/confinit
 chmod a+x /bin/confinit
+
+# Bookworm NetworkManager erabiltzen du, eta ez du
+# /etc/wpa_supplicant/wpa_supplicant.conf-eko sare konfigurazioa inportatzen.
+# wpa_supplicant eta dhcpcd gaitu eta lehenetsi IoMBian-eko konfigurazioaren
+# iturri nagusi izaten jarrai dezaten.
+systemctl disable --now NetworkManager.service NetworkManager-wait-online.service || true
+systemctl enable wpa_supplicant.service dhcpcd.service
 EOF
 
 # systemd units
