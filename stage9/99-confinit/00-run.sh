@@ -29,6 +29,7 @@ systemctl enable wpa_supplicant.service dhcpcd.service
 EOF
 
 # systemd units
+install -m 644 -g root -o root confinit/systemd/wpa_supplicant.service ${ROOTFS_DIR}/lib/systemd/system
 install -m 644 -g root -o root confinit/systemd/confinit-boot@.service ${ROOTFS_DIR}/lib/systemd/system
 install -m 644 -g root -o root confinit/systemd/confinit-intermediate@.service ${ROOTFS_DIR}/lib/systemd/system
 install -m 644 -g root -o root confinit/systemd/confinit-final@.service ${ROOTFS_DIR}/lib/systemd/system

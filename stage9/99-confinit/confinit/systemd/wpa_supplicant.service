@@ -1,0 +1,16 @@
+[Unit]
+Description=WPA supplicant for wlan0
+After=network-pre.target
+Before=dhcpcd.service network.target
+Wants=network-pre.target
+ConditionPathExists=/etc/wpa_supplicant/wpa_supplicant.conf
+
+[Service]
+Type=simple
+ExecStartPre=/sbin/ip link set wlan0 up
+ExecStart=/sbin/wpa_supplicant -s -c/etc/wpa_supplicant/wpa_supplicant.conf -iwlan0
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
