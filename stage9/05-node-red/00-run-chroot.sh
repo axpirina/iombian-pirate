@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
 NODERED_VERSION=5.0.9
+NODERED_INSTALLERS_COMMIT="25d7ad6bbf41600e71da0c8fffcd4779f6469e1b"
+NODERED_INSTALLERS_URL="https://raw.githubusercontent.com/node-red/linux-installers/${NODERED_INSTALLERS_COMMIT}/resources"
 
 NODERED_USER=$FIRST_USER_NAME
 NODERED_GROUP=$FIRST_USER_NAME
@@ -50,12 +52,12 @@ chown -Rf $NODERED_USER:$NODERED_GROUP $NODERED_HOME/.node-red/
 
 # start/stop/log scripts
 mkdir -p /usr/bin
-curl -sL -o /usr/bin/node-red-start https://raw.githubusercontent.com/node-red/linux-installers/master/resources/node-red-start
-curl -sL -o /usr/bin/node-red-stop https://raw.githubusercontent.com/node-red/linux-installers/master/resources/node-red-stop
-curl -sL -o /usr/bin/node-red-restart https://raw.githubusercontent.com/node-red/linux-installers/master/resources/node-red-restart
-curl -sL -o /usr/bin/node-red-reload https://raw.githubusercontent.com/node-red/linux-installers/master/resources/node-red-reload
-curl -sL -o /usr/bin/node-red-log https://raw.githubusercontent.com/node-red/linux-installers/master/resources/node-red-log
-curl -sL -o /etc/logrotate.d/nodered https://raw.githubusercontent.com/node-red/linux-installers/master/resources/nodered.rotate
+curl -fsSL -o /usr/bin/node-red-start "$NODERED_INSTALLERS_URL/node-red-start"
+curl -fsSL -o /usr/bin/node-red-stop "$NODERED_INSTALLERS_URL/node-red-stop"
+curl -fsSL -o /usr/bin/node-red-restart "$NODERED_INSTALLERS_URL/node-red-restart"
+curl -fsSL -o /usr/bin/node-red-reload "$NODERED_INSTALLERS_URL/node-red-reload"
+curl -fsSL -o /usr/bin/node-red-log "$NODERED_INSTALLERS_URL/node-red-log"
+curl -fsSL -o /etc/logrotate.d/nodered "$NODERED_INSTALLERS_URL/nodered.rotate"
 chmod +x /usr/bin/node-red-start
 chmod +x /usr/bin/node-red-stop
 chmod +x /usr/bin/node-red-restart
@@ -63,7 +65,7 @@ chmod +x /usr/bin/node-red-reload
 chmod +x /usr/bin/node-red-log
 
 # add systemd script
-curl -sL -o /lib/systemd/system/nodered.service https://raw.githubusercontent.com/node-red/linux-installers/master/resources/nodered.service
+curl -fsSL -o /lib/systemd/system/nodered.service "$NODERED_INSTALLERS_URL/nodered.service"
 sed -i 's#^User=pi#User='$NODERED_USER'#;s#^Group=pi#Group='$NODERED_GROUP'#;s#^WorkingDirectory=/home/pi#WorkingDirectory='$NODERED_HOME'#;' /lib/systemd/system/nodered.service
 
 # remove unneeded large sentiment library to save space and load time

@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
       - name: Install qemu-user-static
@@ -17,10 +17,12 @@ jobs:
       - name: Build IoMBian
         run:
           ./build-iombian.sh
+      - name: Validate image
+        run: sudo ./test-image.sh deploy/*.zip
       - name: Rename zip file name
         run: mv deploy/*.zip iombian-${{ github.sha }}.zip 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: iombian-${{ github.sha }}.zip
           path: iombian-${{ github.sha }}.zip
