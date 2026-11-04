@@ -20,9 +20,11 @@ chmod a+x /bin/confinit
 
 # Bookworm NetworkManager erabiltzen du, eta ez du
 # /etc/wpa_supplicant/wpa_supplicant.conf-eko sare konfigurazioa inportatzen.
-# wpa_supplicant eta dhcpcd gaitu eta lehenetsi IoMBian-eko konfigurazioaren
-# iturri nagusi izaten jarrai dezaten.
-systemctl disable --now NetworkManager.service NetworkManager-wait-online.service || true
+# Instalatu dhcpcd, ez baitago Bookworm-eko oinarrizko irudian, eta gaitu
+# wpa_supplicant eta dhcpcd NetworkManager-en ordez.
+apt-get update
+apt-get install -y dhcpcd5
+systemctl disable NetworkManager.service NetworkManager-wait-online.service || true
 systemctl enable wpa_supplicant.service dhcpcd.service
 EOF
 

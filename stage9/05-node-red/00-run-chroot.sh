@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-NODERED_VERSION=5.0.8
+NODERED_VERSION=5.0.9
 
 NODERED_USER=$FIRST_USER_NAME
 NODERED_GROUP=$FIRST_USER_NAME
@@ -8,6 +8,11 @@ NODERED_HOME=$( getent passwd "$NODERED_USER" | cut -d: -f6 )
 
 # install node-red package
 npm i -g --unsafe-perm --no-progress node-red@$NODERED_VERSION
+
+# Apply patched releases for Node-RED's pinned HTTP request handlers.
+NODERED_GLOBAL_HOME=$(npm root -g)/node-red
+npm --prefix "$NODERED_GLOBAL_HOME" pkg set 'overrides.body-parser=1.20.9' 'overrides.multer=2.5.0'
+npm --prefix "$NODERED_GLOBAL_HOME" install --omit=dev --unsafe-perm --no-progress
 
 # set local folder
 mkdir -p "$NODERED_HOME/.node-red/node_modules"
