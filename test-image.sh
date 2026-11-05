@@ -71,8 +71,9 @@ fail() {
 [[ -L $root/etc/systemd/system/multi-user.target.wants/confinit-final@boot-firmware-config.service ]] || fail "Confinit final configuration is not enabled"
 
 wetty_unit=$root/etc/systemd/system/wetty.service
-grep -q -- '--host 127.0.0.1' "$wetty_unit" || fail "WeTTY is not bound to loopback"
-! grep -q -- '--host 0.0.0.0' "$wetty_unit" || fail "WeTTY is exposed on all interfaces"
+grep -q -- '--host 0.0.0.0' "$wetty_unit" || fail "WeTTY is not accessible from the local network"
+grep -q '^After=.*ssh.service' "$wetty_unit" || fail "WeTTY does not wait for SSH"
+grep -q '^Wants=.*ssh.service' "$wetty_unit" || fail "WeTTY does not request SSH"
 
 awk -F: '$1 == "iompi" { found=1; if ($3 != 0) exit 1 } END { if (!found) exit 1 }' \
     "$root/etc/shadow" || fail "The default password is not marked for rotation"
@@ -81,6 +82,7 @@ awk '/^sshd:/ { in_ssh=1 } in_ssh && /^  enabled: true$/ { enabled=1 } END { exi
     "$boot/config/parameters.yml" || fail "Confinit would disable SSH"
 grep -q 'mode: "0600"' "$boot/config/.confinit-boot.yml" || fail "Wi-Fi configuration permissions are not restricted"
 grep -q 'len $value' "$boot/config/etc/wpa_supplicant/wpa_supplicant.conf.template" || fail "Hashed Wi-Fi PSKs are not supported"
+[[ -x $boot/config/scripts/boot/00-enable-ssh.sh ]] || fail "SSH first-boot recovery is missing"
 [[ -f $boot/config/scripts/boot/13-protect-secrets.py ]] || fail "Wi-Fi secret protection is missing"
 [[ -f $boot/config/scripts/final/99-require-password-change.sh ]] || fail "Password rotation is missing"
 

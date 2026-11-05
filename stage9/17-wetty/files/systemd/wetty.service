@@ -1,6 +1,7 @@
 [Unit]
 Description=WeTTY
-After=network-online.target
+After=network-online.target ssh.service
+Wants=network-online.target ssh.service
 
 [Service]
 Type=simple
@@ -11,7 +12,7 @@ TimeoutStopSec=5
 SyslogIdentifier=wetty
 
 WorkingDirectory=/opt/wetty
-ExecStart=/opt/wetty/bin/wetty --host 127.0.0.1 -p 3000 --title Wetty --base /
+ExecStart=/opt/wetty/bin/wetty --host 0.0.0.0 -p 3000 --title Wetty --base /
 
 [Install]
 WantedBy=default.target

@@ -62,7 +62,9 @@ build defaults are:
 
 - Hostname: `iombian`; user: `iompi`; initial password: `iompi`.
 - SSH enabled from the first boot. The default password must be changed when
-  logging in through SSH or a local console.
+  logging in through SSH or a local console. First-boot SSH diagnostics are
+  saved to `/boot/firmware/ssh-boot-status.log`, which is accessible by inserting
+  the microSD card into another computer.
 - Time zone `Europe/Madrid`, locale `es_ES.UTF-8` and Wi-Fi country `ES`.
 - Ethernet uses the static address `192.168.0.10/24` by default (no gateway or
   DNS configured). Wi-Fi uses DHCP after its credentials are configured.
@@ -70,8 +72,9 @@ build defaults are:
   `/boot/firmware/config`; `/boot/config` is retained as a compatibility link.
 - `wpa_supplicant` and `dhcpcd` manage wireless networking instead of
   NetworkManager.
-- WeTTY listens on `127.0.0.1:3000` only; it is not exposed on all network
-  interfaces by default.
+- WeTTY listens on port `3000` for local-network access at
+  `http://<device-address>:3000/`. It asks for SSH credentials; no password is
+  stored in the service. Keep it restricted to a trusted local network.
 
 > **Warning**: Change the default `iompi` password before connecting the device
 > to an untrusted network. Defining a new password in `parameters.yml` or using
