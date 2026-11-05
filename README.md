@@ -2,6 +2,11 @@
 
 ![IoMBian builder](https://github.com/Tknika/iombian/workflows/IoMBian%20builder/badge.svg)
 
+> **Fork of [Tknika/iombian](https://github.com/Tknika/iombian).** The original project,
+> upstream releases and IoMBian services are linked throughout this document.
+> This fork currently builds a Raspberry Pi OS **Bookworm arm64** image with
+> updated Node-RED dependencies, Wi-Fi startup and default security hardening.
+
 
 ## Introduction
 
@@ -49,11 +54,37 @@ Wait a few minutes (< 5 minutes) until the process is over.
 > **Warning**: all IoMBian services are password protected by default, with ```iompi``` as the username and the password being the one defined in the ```parameters.yml``` file (```iompi``` also by default).
 
 
+## Current image configuration
+
+This fork builds a **Raspberry Pi OS Lite Bookworm arm64** image using the
+Bookworm branch of [pi-gen](https://github.com/RPi-Distro/pi-gen). Its current
+build defaults are:
+
+- Hostname: `iombian`; user: `iompi`; initial password: `iompi`.
+- SSH enabled from the first boot. The default password must be changed when
+  logging in through SSH or a local console.
+- Time zone `Europe/Madrid`, locale `es_ES.UTF-8` and Wi-Fi country `ES`.
+- Ethernet uses the static address `192.168.0.10/24` by default (no gateway or
+  DNS configured). Wi-Fi uses DHCP after its credentials are configured.
+- Boot configuration is stored in the firmware partition under
+  `/boot/firmware/config`; `/boot/config` is retained as a compatibility link.
+- `wpa_supplicant` and `dhcpcd` manage wireless networking instead of
+  NetworkManager.
+- WeTTY listens on `127.0.0.1:3000` only; it is not exposed on all network
+  interfaces by default.
+
+> **Warning**: Change the default `iompi` password before connecting the device
+> to an untrusted network. Defining a new password in `parameters.yml` or using
+> IoMBian Configurator is recommended. Wi-Fi passphrases are converted to PSK
+> hashes during configuration, and the generated Wi-Fi configuration has
+> restricted permissions.
+
 ## Software
 
-IoMBian is based on the latest stable version of [Raspberry Pi OS Lite](https://www.raspberrypi.org/software/operating-systems/), to which the following programs have been added:
+IoMBian is based on [Raspberry Pi OS Lite](https://www.raspberrypi.org/software/operating-systems/)
+Bookworm arm64, to which the following programs have been added:
 
-- [Node-RED](https://nodered.org/): a visual development tool, originally created by IBM, that allows to collect information from hardware devices, APIs and online services as part of the Internet of Things.
+- [Node-RED](https://nodered.org/) 5.0.9 on Node.js 22.21.1: a visual development tool, originally created by IBM, that allows to collect information from hardware devices, APIs and online services as part of the Internet of Things.
 - [Mosquitto](https://mosquitto.org/): a widespread MQTT server (broker) developed by the Eclipse Foundation.
 - [MQTT Web Client](https://github.com/hivemq/hivemq-mqtt-web-client): MQTT web client thanks to which the user (student) can send his first MQTT messages without having to install anything in his computer. Combined with the pre-installed mosquitto broker, it allows to start playing with the protocol in a few minutes.
 - [Monit](https://mmonit.com/monit/): program that can monitor the state of the system and is capable of sending notifications to the user (by e-mail) when something does not work as expected.
@@ -82,26 +113,41 @@ For more information about the installation and configuration process of the pro
 
 ## Development
 
-While the operating system can be manually generated on any computer (it is based on the [pi-gen](https://github.com/RPi-Distro/pi-gen#config) project), this GitHub repository is set up to compile the image automatically through GitHub Actions.
-To do this, you just need to create a new 'Release' (using the "Draft a new release" button, as the repository administrator) and in less than 60 minutes the 'Release' will be updated with the corresponding .zip file.
+The operating system is based on [pi-gen](https://github.com/RPi-Distro/pi-gen#config)
+and can be built locally or through GitHub Actions:
 
-However, if you still want to compile the distribution locally, you can take the following steps (not recommended):
+- A push to `master` runs the `IoMBian builder` workflow, validates the image and
+  uploads a ZIP artifact named after the commit SHA. The artifact is retained for
+  14 days.
+- Publishing a release runs the `IoMBian publisher` workflow and attaches
+  `iombian-<tag>.zip` to that release. Upstream releases remain available from
+  [Tknika/iombian](https://github.com/Tknika/iombian/releases).
 
-> Git and docker must be pre-installed on the local machine
+### Local build
+
+Install Git, Docker and `qemu-user-static`. Clone the repository and initialize
+all submodules before building:
 
 ```bash
 git clone https://github.com/Tknika/iombian.git
-```
-
-```bash
 cd iombian
-```
-
-```bash
+git submodule update --init --recursive
 ./build-iombian.sh
 ```
 
-After 30-60 minutes, the .img file will be available in the 'deploy' folder.
+For this fork, use its own clone URL instead. `build-iombian.sh` also initializes
+submodules, disables the intermediate stage2 image export for the duration of the
+build and invokes Docker with the repository's [config](config). Docker must be
+able to run privileged containers. The resulting ZIP and build logs are placed in
+`deploy/`; the build normally takes 30–60 minutes, depending on the host and
+network.
+
+To run the same offline image checks as CI (requires root, `unzip` and loop
+device support):
+
+```bash
+sudo ./test-image.sh deploy/*.zip
+```
 
 
 ## Author
